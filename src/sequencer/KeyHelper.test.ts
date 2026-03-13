@@ -3,7 +3,6 @@ import {
   midiToFrequency,
   noteToMidi,
   getScaleNotes,
-  NOTE_NAMES,
 } from './KeyHelper'
 
 describe('midiToFrequency', () => {

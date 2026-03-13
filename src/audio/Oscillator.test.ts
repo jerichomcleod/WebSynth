@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { createAudioContextMock } from '../test-utils/audioMocks'
 import { SynthOscillator } from './Oscillator'
 
-function setup(overrides: Partial<Parameters<typeof SynthOscillator>[1]> = {}) {
+function setup(overrides: Partial<ConstructorParameters<typeof SynthOscillator>[1]> = {}) {
   const ctx = createAudioContextMock() as unknown as AudioContext
   const destination = { connect: vi.fn() } as unknown as AudioNode
   const config = { type: 'sine' as const, detune: 0, volume: 0.8, ...overrides }

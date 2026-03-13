@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { SoundDesigner, DEFAULT_INSTRUMENT_CONFIG, pct, sec } from './SoundDesigner'
 import type { InstrumentConfig } from '../types'
 

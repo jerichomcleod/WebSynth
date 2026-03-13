@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { createAudioContextMock } from '../test-utils/audioMocks'
 import { Envelope } from './Envelope'
 
-function setup(overrides: Partial<Parameters<typeof Envelope>[1]> = {}) {
+function setup(overrides: Partial<ConstructorParameters<typeof Envelope>[1]> = {}) {
   const ctx = createAudioContextMock() as unknown as AudioContext
   const destination = { connect: vi.fn() } as unknown as AudioNode
   const config = {
@@ -44,7 +44,7 @@ describe('Envelope', () => {
     })
 
     it('uses exponential ramp to peak (1) for attack', () => {
-      const { env, gain, config } = setup({ attack: 0.1 })
+      const { env, gain } = setup({ attack: 0.1 })
       env.noteOn(0)
       expect(gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(1, 0.1)
     })
@@ -57,7 +57,7 @@ describe('Envelope', () => {
     })
 
     it('uses exponential ramp to sustain after attack+decay', () => {
-      const { env, gain, config } = setup({ attack: 0.1, decay: 0.2, sustain: 0.5 })
+      const { env, gain } = setup({ attack: 0.1, decay: 0.2, sustain: 0.5 })
       env.noteOn(0)
       expect(gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(0.5, 0.1 + 0.2)
     })
