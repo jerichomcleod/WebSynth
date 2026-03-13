@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSynth</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>WebSynth</h1>
+    </header>
+
+    <main>
+      <!-- Sound Designer Panel -->
+      <section id="sound-designer" class="panel">
+        <h2>Sound Designer</h2>
+        <div id="sound-designer-content"></div>
+      </section>
+
+      <!-- Piano Roll Panel -->
+      <section id="piano-roll-panel" class="panel">
+        <h2>Piano Roll</h2>
+        <div id="key-selector-container"></div>
+        <div id="piano-roll-editor"></div>
+        <div id="transport-container"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

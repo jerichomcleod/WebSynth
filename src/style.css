@@ -1,0 +1,764 @@
+:root {
+  --bg: #111418;
+  --surface: #1b1f28;
+  --accent: #2a303f;
+  --highlight: #20b2a0;
+  --highlight-dim: color-mix(in srgb, var(--highlight) 60%, transparent);
+  --text: #dde1ea;
+  --text-muted: #6b7585;
+  --radius: 6px;
+  --gap: 1rem;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Courier New', Courier, monospace;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: var(--surface);
+  padding: 0.6rem 2rem;
+  border-bottom: 2px solid var(--highlight);
+  flex-shrink: 0;
+}
+
+header h1 {
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+  color: var(--highlight);
+  text-transform: uppercase;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--gap);
+  padding: var(--gap);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+  padding: 1rem;
+}
+
+.panel h2 {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 0.4rem;
+}
+
+#sound-designer {
+  overflow-y: auto;
+}
+
+#piano-roll-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+#piano-roll-editor {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ─── Sound Designer ─────────────────────────────────────────────────────── */
+
+.sd-preview-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.sd-preview-btn {
+  background: var(--highlight);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.4rem 0.9rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  font-weight: bold;
+}
+
+.sd-preview-btn:hover { opacity: 0.85; }
+.sd-preview-btn:active { opacity: 0.7; }
+
+.sd-section {
+  margin-bottom: 1.25rem;
+}
+
+.sd-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.sd-section-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sd-add-btn {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--text-muted);
+  border-radius: var(--radius);
+  padding: 0.15rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.sd-add-btn:hover:not(:disabled) {
+  border-color: var(--highlight);
+  color: var(--text);
+}
+
+.sd-add-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.sd-inline-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* Oscillator rows */
+.sd-osc-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 20px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.sd-osc-row:last-child { border-bottom: none; }
+
+.sd-remove-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.sd-remove-btn:hover { color: var(--highlight); }
+.sd-remove-placeholder { display: block; width: 20px; }
+
+/* Noise controls */
+.sd-noise-controls {
+  display: flex;
+  gap: 1rem;
+  padding: 0.4rem 0;
+}
+
+.sd-noise-controls[hidden] { display: none; }
+
+/* Envelope — vertical sliders */
+.sd-envelope {
+  display: flex;
+  gap: 0.5rem;
+  height: 180px;
+  padding: 0.25rem 0;
+}
+
+.sd-env-param {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.sd-env-label {
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.sd-env-range {
+  flex: 1;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 28px;
+  height: 100%;
+  cursor: pointer;
+  -webkit-appearance: slider-vertical;
+  appearance: none;
+}
+
+.sd-env-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--highlight);
+  cursor: pointer;
+  box-shadow: 0 0 4px color-mix(in srgb, var(--highlight) 50%, transparent);
+}
+
+.sd-env-range::-webkit-slider-runnable-track {
+  background: var(--accent);
+  width: 4px;
+  border-radius: 2px;
+}
+
+.sd-env-number {
+  width: 100%;
+  text-align: center;
+  font-size: 0.65rem;
+  font-family: inherit;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  color: var(--highlight);
+  border-radius: 3px;
+  padding: 2px 4px;
+  -moz-appearance: textfield;
+}
+
+.sd-env-number::-webkit-outer-spin-button,
+.sd-env-number::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.sd-env-number:focus {
+  outline: 1px solid var(--highlight);
+  border-color: var(--highlight);
+}
+
+/* Shared knob label */
+.sd-knob-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sd-knob-label span { color: var(--text-muted); }
+
+.sd-knob-label output {
+  font-size: 0.65rem;
+  color: var(--highlight);
+  min-width: 3ch;
+  text-align: center;
+}
+
+/* Range inputs */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--highlight);
+  cursor: pointer;
+}
+
+/* Selects */
+select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+select:focus { outline: 1px solid var(--highlight); }
+
+/* ─── Key Selector ───────────────────────────────────────────────────────── */
+
+.ks-root-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.ks-note-btn {
+  flex: 1;
+  min-width: 28px;
+  padding: 0.3rem 0.2rem;
+  font-family: inherit;
+  font-size: 0.7rem;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  color: var(--text-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.ks-note-btn.sharp {
+  background: color-mix(in srgb, var(--accent) 60%, var(--bg));
+  font-size: 0.6rem;
+}
+
+.ks-note-btn.active {
+  background: var(--highlight);
+  border-color: var(--highlight);
+  color: var(--bg);
+  font-weight: bold;
+}
+
+.ks-note-btn:hover:not(.active) {
+  border-color: var(--highlight);
+  color: var(--text);
+}
+
+.ks-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ks-scale-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.ks-scale-btn {
+  padding: 0.25rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.7rem;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  color: var(--text-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.ks-scale-btn.active {
+  background: var(--accent);
+  color: var(--text);
+  border-color: var(--highlight);
+}
+
+.ks-scale-btn:hover:not(.active) { color: var(--text); }
+
+/* ─── Piano Roll Editor ───────────────────────────────────────────────────── */
+
+.pre-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Octave expand/shrink bars above and below the editor */
+.pre-oct-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 0;
+  flex-shrink: 0;
+}
+
+.pre-oct-top { justify-content: flex-start; }
+.pre-oct-bottom { justify-content: flex-end; }
+
+.pre-oct-btn {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--text-muted);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: inherit;
+  font-size: 0.65rem;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.pre-oct-btn:hover {
+  border-color: var(--highlight);
+  color: var(--highlight);
+}
+
+.pre-oct-shrink {
+  width: 22px;
+  padding: 2px 4px;
+  text-align: center;
+}
+
+.pre-editor {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.pre-keys {
+  flex-shrink: 0;
+  width: 64px;
+  overflow: hidden;
+  border-right: 2px solid var(--accent);
+  background: var(--surface);
+}
+
+.pre-key-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  cursor: pointer;
+  transition: background 0.08s;
+  box-sizing: border-box;
+}
+
+.pre-key-row.sharp {
+  background: color-mix(in srgb, var(--bg) 65%, var(--accent));
+}
+
+.pre-key-row:hover {
+  background: var(--highlight);
+}
+
+.pre-key-row:hover .pre-key-label {
+  color: var(--bg);
+}
+
+.pre-key-label {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  font-family: inherit;
+  pointer-events: none;
+}
+
+.pre-grid-scroll {
+  flex: 1;
+  overflow: auto;
+}
+
+.pre-grid-inner {
+  position: relative;
+}
+
+.pre-grid-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.pre-row-bg {
+  position: absolute;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  box-sizing: border-box;
+}
+
+.pre-row-bg.sharp {
+  background: color-mix(in srgb, var(--bg) 50%, var(--accent));
+}
+
+/* Vertical column lines */
+.pre-col-beat {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  background: color-mix(in srgb, var(--accent) 80%, var(--text));
+  pointer-events: none;
+}
+
+.pre-col-bar {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  background: color-mix(in srgb, var(--highlight) 50%, var(--accent));
+  pointer-events: none;
+}
+
+.pre-notes-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.pre-note {
+  position: absolute;
+  background: var(--highlight);
+  border: 1px solid color-mix(in srgb, var(--highlight) 70%, white);
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: filter 0.08s;
+}
+
+.pre-note:hover {
+  filter: brightness(1.2);
+}
+
+.pre-note-label {
+  font-size: 0.5rem;
+  color: var(--bg);
+  font-weight: bold;
+  padding-left: 3px;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  flex-shrink: 1;
+}
+
+.pre-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+  background: color-mix(in srgb, var(--highlight) 50%, white);
+  border-radius: 0 3px 3px 0;
+  flex-shrink: 0;
+}
+
+.pre-ghost {
+  position: absolute;
+  background: color-mix(in srgb, var(--highlight) 35%, transparent);
+  border: 1px dashed var(--highlight);
+  border-radius: 3px;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.pre-playhead {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  background: var(--text);
+  opacity: 0.7;
+  pointer-events: none;
+  display: none;
+  z-index: 10;
+}
+
+.pre-empty {
+  display: block;
+  padding: 0.5rem;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ─── Transport Bar ───────────────────────────────────────────────────────── */
+
+.tb-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--accent);
+  margin-top: 0.5rem;
+}
+
+.tb-play-btn {
+  padding: 0.4rem 1.2rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  border-radius: var(--radius);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: background 0.1s;
+  min-width: 80px;
+}
+
+.tb-play-btn.active {
+  background: var(--highlight);
+  border-color: var(--highlight);
+  color: var(--bg);
+  font-weight: bold;
+}
+
+.tb-play-btn:hover { opacity: 0.85; }
+
+.tb-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tb-input {
+  width: 52px;
+  text-align: center;
+  font-family: inherit;
+  font-size: 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  border-radius: 4px;
+  padding: 2px 4px;
+  -moz-appearance: textfield;
+}
+
+.tb-input::-webkit-outer-spin-button,
+.tb-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.tb-input:focus { outline: 1px solid var(--highlight); border-color: var(--highlight); }
+
+.tb-select {
+  width: auto;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+}
+
+.tb-export-btn {
+  margin-left: auto;
+  padding: 0.4rem 1rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--text-muted);
+  border-radius: var(--radius);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.tb-export-btn:hover:not(:disabled) {
+  border-color: var(--highlight);
+  color: var(--text);
+}
+
+.tb-export-btn.active {
+  border-color: #e05;
+  color: #e05;
+}
+
+.tb-export-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Sound Designer — Filter, LFO, Effects ──────────────────────────────── */
+
+.sd-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sd-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sd-filter-toggle {
+  flex-shrink: 0;
+  width: 44px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sd-lfo {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.sd-lfo-controls[hidden] { display: none; }
+
+.sd-effects {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.sd-effect-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sd-effect-toggle {
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sd-effect-params {
+  display: flex;
+  gap: 0.75rem;
+  padding-left: 1rem;
+  flex-wrap: wrap;
+}
+
+.sd-effect-params[hidden] { display: none; }
